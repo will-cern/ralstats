@@ -190,7 +190,7 @@ def getWorkspace(day,month):
     vars["sig_mass"].setVal(110)
     data.SetName("obsData");
     globs = own(own(vars.selectByAttrib("global",True)).snapshot())
-    w.saveSnapshot("obsGlobs",globs)
+    w.saveSnapshot("obsData",globs)
     w.Import(data)
     
     return w
