@@ -149,13 +149,31 @@ def asymptotic_pvalue_q0(q0,mu,mu_prime,sigma_mu,mu_min=-float('inf'),mu_max=flo
     """
     return asymptotic_pvalue(ROOT.Asymptotica.OneSidedNegative,q0,mu,mu_prime,sigma_mu,mu_min,mu_max)
 
-def asymptotic_expected_qmu(nSigma,mu,mu_prime,sigma_mu,mu_min=-float('inf'),mu_max=float('inf')):
+def asymptotic_expected_qmu(pvalue,mu,mu_prime,sigma_mu,mu_min=-float('inf'),mu_max=float('inf')):
+    """
+    Returns the qmu test statistic value corresponding to a given given p-value:
+      pvalue : The pvalue that the returning test statistic would have under the true hypothesis (mu_prime)
+      mu : The null hypothesis value of mu
+      mu_prime : the true hypothesis mu value ( = mu for null hypothesis )
+      sigma_mu : stdev of mu_hat under the true hypothesis (estimate as |mu - mu_prime|/sqrt(tmu(asimov_mu_prime))). Dependence on this parameter disappears for mu=mu_prime=0. 
+      mu_min : min value of mu
+      mu_max : max value of mu
+    """
     return ROOT.Asymptotica.k(ROOT.Asymptotica.IncompatibilityFunction(ROOT.Asymptotica.OneSidedPositive,mu),
-                           ROOT.Math.normal_cdf(nSigma), mu,mu_prime,sigma_mu,mu_min,mu_max)
+                           pvalue, mu,mu_prime,sigma_mu,mu_min,mu_max)
     
-def asymptotic_expected_q0(nSigma,mu,mu_prime,sigma_mu,mu_min=-float('inf'),mu_max=float('inf')):
+def asymptotic_expected_q0(pvalue,mu,mu_prime,sigma_mu,mu_min=-float('inf'),mu_max=float('inf')):
+    """
+    Returns the q0 test statistic value corresponding to a given given p-value:
+      pvalue : The pvalue that the returning test statistic would have under the true hypothesis (mu_prime)
+      mu : The null hypothesis value of mu
+      mu_prime : the true hypothesis mu value ( = mu for null hypothesis )
+      sigma_mu : stdev of mu_hat under the true hypothesis (estimate as |mu - mu_prime|/sqrt(tmu(asimov_mu_prime))). Dependence on this parameter disappears for mu=mu_prime=0. 
+      mu_min : min value of mu
+      mu_max : max value of mu
+    """
     return ROOT.Asymptotica.k(ROOT.Asymptotica.IncompatibilityFunction(ROOT.Asymptotica.OneSidedNegative,mu),
-                           ROOT.Math.normal_cdf(nSigma), mu,mu_prime,sigma_mu,mu_min,mu_max)
+                           pvalue, mu,mu_prime,sigma_mu,mu_min,mu_max)
     
     
 def getWorkspace(day,month):
