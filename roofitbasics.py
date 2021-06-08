@@ -13,6 +13,13 @@ myVar = None
 mySet = None
 myList = None
 
+myYield = ROOT.RooRealVar("yield","yield",50,0,100)
+myObs = ROOT.RooRealVar("x","x",5,0,10)
+myPar1 = ROOT.RooRealVar("y","y",5,3,6)
+myPar2 = ROOT.RooRealVar("z","z",1,0,5)
+myGaus = ROOT.RooGaussian("myPdf","myPdf",myObs,myPar1,myPar2)
+myModel = ROOT.RooExtendPdf("myModel","myModel",myGaus,myYield)
+
 # define here to keep alive
 mySetVars = [ROOT.RooRealVar("foo","",3),ROOT.RooRealVar("bar","",6,0,10),ROOT.RooCategory("baz","")]
 myListVars = [ROOT.RooRealVar("foo","",4),ROOT.RooCategory("baz","")]
@@ -32,6 +39,40 @@ def getObject(objName):
         for a in myListVars: s.add(a)
         myList = s
         return s
+    if objName=="myData":
+        w = ROOT.RooRealVar("weightVar","weight",1)
+        c = ROOT.RooCategory("channelCat","channelCat")
+        c.defineType("SR");c.defineType("CR")
+        s = ROOT.RooArgSet(mySetVars[0],w,c);
+        d = ROOT.RooDataSet("myData","My Dataset",s,"weightVar")
+        mySetVars[0].setVal(3)
+        d.add(s,30)
+        c.setIndex(1)
+        d.add(s,20)
+        mySetVars[0].setVal(2)
+        d.add(s,15)
+        return d
+    if objName=="myModel":
+        return myModel
+    if objName=="myWorkspace":
+        ROOT.RooMsgService.instance().getStream(ROOT.RooFit.INFO).removeTopic(ROOT.RooFit.NumIntegration)
+        def own(obj):
+            ROOT.SetOwnership(obj,True)
+            return obj
+        f = ROOT.TFile("tutorialModelTemplate.root")
+        w = f.Get("combined")
+        model = w.pdf("simPdf")
+        obs = own(own(own(model.getVariables()).selectByAttrib("obs",True)).selectByAttrib("global",False))
+        globs = own(own(model.getVariables()).selectByAttrib("global",True))
+        w.var("sig_mass").setVal(100)
+        w.var("mu").setVal(0)
+        d = model.generate(obs, ROOT.RooFit.Extended())
+        d.SetName("obsData")
+        w.Import(d,ROOT.RooFit.Silence(True))
+        globs.first().setVal(5.5)
+        w.saveSnapshot("obsData",globs)
+        globs.first().setVal(5)
+        return w
     
     raise RuntimeError("Unknown object {}".format(objName))
     
@@ -73,3 +114,58 @@ def test_2d(ans):
         else: printGreen("test_2d: CORRECT")    
     except:
         printRed("test_2d: INCORRECT - didn't give a collection")
+    
+    
+def test_3a(ans):
+    try:
+        if ans != "channelCat": printRed("test_3a: INCORRECT - wrong variable name")
+        else: printGreen("test_3a: CORRECT")
+    except:
+        printRed("test_3a: INCORRECT - didn't give a string")
+def test_3b(ans):
+    try:
+        if ans != 15: printRed("test_3b: INCORRECT - wrong weight")
+        else: printGreen("test_3b: CORRECT")
+    except:
+        printRed("test_3b: INCORRECT - didn't give a number")       
+
+def test_4a(ans):
+    try:
+        def own(obj):
+            ROOT.SetOwnership(obj,True)
+            return obj
+        graph = ROOT.TGraph()
+        var = own(myModel.getVariables()).find("x")
+        import numpy as np
+        for x in np.arange(var.getMin(),var.getMax(),0.2):
+            var.setVal( x )
+            graph.AddPoint(var.getVal(),myModel.getVal(ROOT.RooArgSet(var)))
+        if ans.GetN()!=graph.GetN(): 
+            printRed("test_4a: INCORRECT - wrong number of points")
+            return
+        
+        for i in range(graph.GetN()):
+            if (abs(graph.GetPointX(i)-ans.GetPointX(i))>0.0001):
+                printRed("test_4a: INCORRECT - wrong x value: {}".format(ans.GetPointX(i)))
+                return
+            elif (abs(graph.GetPointY(i)-ans.GetPointY(i))>0.0001):
+                printRed("test_4a: INCORRECT - wrong y value: {}".format(ans.GetPointY(i)))
+                return
+        
+        else: printGreen("test_4a: CORRECT")
+    except:
+        printRed("test_4a: INCORRECT - didn't give a graph")
+        
+def test_5a(ans):
+    try:
+        if ans != "simPdf": printRed("test_5a: INCORRECT - wrong pdf name")
+        else: printGreen("test_5a: CORRECT")
+    except:
+        printRed("test_5a: INCORRECT - didn't give a string") 
+def test_5b(name,val):
+    try:
+        if name != "globs_alpha_par": printRed("test_5b: INCORRECT - wrong global observable name")
+        elif val != 5.5: printRed("test_5b: INCORRECT - wrong value")
+        else: printGreen("test_5b: CORRECT")
+    except:
+        printRed("test_5b: INCORRECT - didn't give a name and number")         

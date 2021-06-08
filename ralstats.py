@@ -129,6 +129,7 @@ def asymptotic_pvalue(type,k,mu,mu_prime,sigma_mu,mu_min=-float('inf'),mu_max=fl
 
 def asymptotic_pvalue_qmu(qmu,mu,mu_prime,sigma_mu,mu_min=-float('inf'),mu_max=float('inf')):
     """
+    Returns the asymptotic p-value of qmu test statistic 
     qmu : the one-sided-positive test statistic value 
     mu : the null hypothesis mu value
     mu_prime : the true hypothesis mu value ( = mu for null hypothesis )
