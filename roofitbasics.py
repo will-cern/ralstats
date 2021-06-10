@@ -170,8 +170,8 @@ def test_5b(ans):
         printRed("test_5b: INCORRECT - didn't give a string") 
 def test_5c(name,val):
     try:
-        if name != "globs_alpha_par": printRed("test_5b: INCORRECT - wrong global observable name")
-        elif val != 5.5: printRed("test_5b: INCORRECT - wrong value")
-        else: printGreen("test_5b: CORRECT")
+        if name != "globs_alpha_par": printRed("test_5c: INCORRECT - wrong global observable name")
+        elif val != 5.5: printRed("test_5c: INCORRECT - wrong value")
+        else: printGreen("test_5c: CORRECT")
     except:
-        printRed("test_5b: INCORRECT - didn't give a name and number")         
+        printRed("test_5c: INCORRECT - didn't give a name and number")         
