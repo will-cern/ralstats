@@ -16,6 +16,9 @@ def own(obj):
     return obj
 
 def plot(model,dataset,globs,fitResult=None):
+    """
+    A visualization of the model and dataset, taking into account the current values of the parameters of the model. It shows one plot for each channel of the model, and a plot for each global observable overlaying its corresponding probability distribution in the model.
+    """
     oldPad = ROOT.gPad
     if not ROOT.gROOT.GetListOfCanvases().FindObject("plot"):
         c = ROOT.TCanvas("plot","",700,215)
@@ -83,6 +86,12 @@ def plot(model,dataset,globs,fitResult=None):
     if oldPad: oldPad.cd()
 
 def generate(model,fitresult,expected=False):
+    """
+    fitresult: the RooFitResult of parameter values to generate for (if pass "None" the current values of parameters are used)
+    expected: If True, returns the expected (asimov) dataset rather than a toy dataset.
+    
+    Returns a `RooDataSet` and a `RooArgSet` of the dataset and globs of the generated dataset.
+    """
     snap = own(own(model.getVariables()).snapshot())
     obs = own(own(own(model.getVariables()).selectByAttrib("obs",True)).selectByAttrib("global",False))
     globs = own(own(model.getVariables()).selectByAttrib("global",True))
@@ -112,6 +121,14 @@ def nll(model,dataset,globs):
     return out
 
 def fit(model,dataset,globs):
+    """
+    Returns a RooFitResult from fitting the model to the data. The floating parameters of the model are the ones that are not marked constant at the time the function is called.
+    
+    model: the model to fit (RooAbsPdf)
+    dataset: the dataset to fit (RooDataSet)
+    globs: the global observable values for the dataset (RooArgSet)
+    
+    """
     _nll = nll(model,dataset,globs)
     own(_nll.getVariables()).assignValueOnly(globs)
     msglevel = ROOT.RooMsgService.instance().globalKillBelow()
@@ -186,6 +203,7 @@ def getWorkspace(day,month):
     model.treeNodeServerList(vars)
     # vars.Print("v")
     vars["mu"].setVal(1)
+    vars["sig_mass"].setVal( whatIsTheAnswer(day,month) )
     data,globs = generate(model,None)
     vars["mu"].setVal(0)
     vars["sig_mass"].setVal(110)
@@ -195,4 +213,12 @@ def getWorkspace(day,month):
     w.Import(data)
     
     return w
+
+
+def whatIsTheAnswer(day,month):
     
+    if day==18 and month==6: return 130
+    
+    r = ROOT.TRandom3()
+    r.SetSeed(month*30+day)
+    return 100 + 35*r.Uniform()
