@@ -51,6 +51,8 @@ def getObject(objName):
         d.add(s,20)
         mySetVars[0].setVal(2)
         d.add(s,15)
+        g1 = ROOT.RooRealVar("glob1","glob1",0); g2 = ROOT.RooRealVar("another_glob","another global obs",2)
+        d.setGlobalObservables(ROOT.RooArgSet(g1,g2))
         return d
     if objName=="myModel":
         return myModel
@@ -68,9 +70,10 @@ def getObject(objName):
         w.var("mu").setVal(0)
         d = model.generate(obs, ROOT.RooFit.Extended())
         d.SetName("obsData")
-        w.Import(d,ROOT.RooFit.Silence(True))
         globs.first().setVal(5.5)
-        w.saveSnapshot("obsData",globs)
+        d.setGlobalObservables(globs)
+        w.Import(d,ROOT.RooFit.Silence(True))
+        #w.saveSnapshot("obsData",globs)
         globs.first().setVal(5)
         return w
     
@@ -128,7 +131,13 @@ def test_3b(ans):
         else: printGreen("test_3b: CORRECT")
     except:
         printRed("test_3b: INCORRECT - didn't give a number")       
-
+def test_3c(ans):
+    try:
+        if ans != 2: printRed("test_3c: INCORRECT - wrong number of global observables")
+        else: printGreen("test_3c: CORRECT")
+    except:
+        printRed("test_3c: INCORRECT - didn't give a number")  
+        
 def test_4a(ans):
     try:
         def own(obj):

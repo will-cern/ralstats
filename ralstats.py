@@ -15,7 +15,7 @@ def own(obj):
     ROOT.SetOwnership(obj,True)
     return obj
 
-def plot(model,dataset,globs,fitResult=None):
+def plot(model,dataset,fitResult=None):
     oldPad = ROOT.gPad
     if not ROOT.gROOT.GetListOfCanvases().FindObject("plot"):
         c = ROOT.TCanvas("plot","",700,215)
@@ -24,11 +24,11 @@ def plot(model,dataset,globs,fitResult=None):
         ROOT.gROOT.GetListOfCanvases().FindObject("plot").cd()
     pad = ROOT.gPad.GetPad(0)
     pad.Clear()
-    pad.DivideSquare(model.indexCat().numTypes()+globs.size())
+    pad.DivideSquare(model.indexCat().numTypes()+dataset.getGlobalObservables().size())
     i=0
     gConstr = {}
     if fitResult is None:
-        allobs = ROOT.RooArgSet(globs); allobs.add(dataset.get())
+        allobs = ROOT.RooArgSet(dataset.getGlobalObservables()); allobs.add(dataset.get())
         fitResult = ROOT.Asymptotica.makeFR(model.getParameters(allobs).selectByAttrib("Constant",False))
     for c in model.indexCat():
         i+=1
@@ -36,7 +36,7 @@ def plot(model,dataset,globs,fitResult=None):
         ROOT.gPad.SetLeftMargin(0.2);ROOT.gPad.SetBottomMargin(0.2)
         cPdf = model.getPdf(c.first)
         for s in cPdf.servers():
-            for g in globs:
+            for g in dataset.getGlobalObservables():
                 if s.dependsOn(g) and not s.dependsOn(dataset.get()):
                     gConstr[g] = s
             if s.InheritsFrom("RooRealSumPdf"):
@@ -100,20 +100,21 @@ def generate(model,fitresult,expected=False):
     else:
         data = own(model.generate(obs, ROOT.RooFit.Extended()))
         data_globs = own(own(model.generate(globs, 1)).get().snapshot())
+    data.setGlobalObservables(data_globs)
     own(model.getVariables()).assignValueOnly(snap)
-    return data,data_globs
+    return data
 
-def nll(model,dataset,globs):
+def nll(model,dataset):
     msglevel = ROOT.RooMsgService.instance().globalKillBelow()
     ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
     # cannot do offsetting because will break the minNll values
-    out = own(model.createNLL(dataset,ROOT.RooFit.GlobalObservables(globs),ROOT.RooFit.Offset(0)))
+    out = own(model.createNLL(dataset,ROOT.RooFit.Offset(0)))
     ROOT.RooMsgService.instance().setGlobalKillBelow(msglevel)
     return out
 
-def fit(model,dataset,globs):
-    _nll = nll(model,dataset,globs)
-    own(_nll.getVariables()).assignValueOnly(globs)
+def fit(model,dataset):
+    _nll = nll(model,dataset)
+    if dataset.getGlobalObservables(): own(_nll.getVariables()).assignValueOnly(dataset.getGlobalObservables())
     msglevel = ROOT.RooMsgService.instance().globalKillBelow()
     ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
     mini = ROOT.RooMinimizer(_nll)
@@ -187,12 +188,12 @@ def getWorkspace(day,month):
     # vars.Print("v")
     vars["mu"].setVal(1)
     vars["sig_mass"].setVal( whatIsTheAnswer(day,month) )
-    data,globs = generate(model,None)
+    data = generate(model,None)
     vars["mu"].setVal(0)
     vars["sig_mass"].setVal(110)
     data.SetName("obsData");
-    globs = own(own(vars.selectByAttrib("global",True)).snapshot())
-    w.saveSnapshot("obsData",globs)
+    # globs = own(own(vars.selectByAttrib("global",True)).snapshot())
+    # w.saveSnapshot("obsData",globs)
     w.Import(data)
     
     return w
