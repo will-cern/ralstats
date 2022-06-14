@@ -203,5 +203,5 @@ def whatIsTheAnswer(day,month):
     if day==18 and month==6: return 130
     
     r = ROOT.TRandom3()
-    r.SetRandomSeed(month*30+day)
+    r.SetSeed(month*30+day)
     return 100 + 35*r.Uniform()
