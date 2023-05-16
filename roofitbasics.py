@@ -69,7 +69,7 @@ def getObject(objName):
         w.var("sig_mass").setVal(100)
         w.var("mu").setVal(0)
         d = model.generate(obs, ROOT.RooFit.Extended())
-        d.SetName("obsData")
+        d.SetName("obsData");d.SetTitle("Data")
         globs.first().setVal(5.5)
         d.setGlobalObservables(globs)
         w.Import(d,ROOT.RooFit.Silence(True))
