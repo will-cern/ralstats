@@ -177,7 +177,23 @@ def asymptotic_expected_q0(pvalue,mu,mu_prime,sigma_mu,mu_min=-float('inf'),mu_m
     return ROOT.Asymptotica.k(ROOT.Asymptotica.IncompatibilityFunction(ROOT.Asymptotica.OneSidedNegative,mu),
                            pvalue, mu,mu_prime,sigma_mu,mu_min,mu_max)
     
-    
+
+def createWorkspace(day,month):
+    f = ROOT.TFile("tutorialModelTemplate.root")
+    ws = f.Get("combined")
+    ws.var("mu").setError(1e-9)
+
+    w = ROOT.xRooNode(ws)
+    w.vars()["mu"].setVal(1)
+    w.vars()["sig_mass"].setVal( whatIsTheAnswer(day,month) )
+    data = w["simPdf"].generate()
+    w.vars()["mu"].setVal(0)
+    w.vars()["sig_mass"].setVal(110)
+    data.get().SetName("obsData");
+    data.SetTitle("Data");
+    w.Add(data)
+    w.SaveAs("myWorkspace.root")
+
 def getWorkspace(day,month):
     f = ROOT.TFile("tutorialModelTemplate.root")
     w = f.Get("combined")
