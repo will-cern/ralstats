@@ -4,18 +4,11 @@ These are the Hands-on "Statistical Analysis Lab" materials for the RAL Lectures
 
 # Setup
 
-Launch this tutorial in mybinder: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fgitlab.cern.ch%2Fwill%2Fralstats/HEAD)
+Launch this tutorial in mybinder: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fgitlab.cern.ch%2Fwill%2Fralstats/2024?labpath=Prerequisite.ipynb)
 
-Please login to the jupyter server, open a terminal and clone this repository:
+This binder is setup to use `StatAnalysis` 0.3 release series. You can get this on cvmfs with:
 
 ```
-git clone https://gitlab.cern.ch/will/ralstats.git
+export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+source $ATLAS_LOCAL_ROOT_BASE/user/atlasLocalSetup.sh; asetup StatAnalysis,0.3,latest
 ```
-
-Then open the Prerequisite notebook in the ralstats directory and work through the exercises there to get used to some concepts in RooFit. 
-
-
-
-
-
-These materials has been tested with ROOT 6.24.00 ... earlier versions may not work correctly. 
