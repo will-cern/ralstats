@@ -1,6 +1,6 @@
 # adapted from instructions at https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html#preparing-your-dockerfile
 
-FROM gitlab-registry.cern.ch/atlas/statanalysis:0.3
+FROM gitlab-registry.cern.ch/atlas/statanalysis:0-3
 
 # the base image provides a user called "atlas" that has the correct uid (1000) for binder
 
