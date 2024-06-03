@@ -1,0 +1,6 @@
+name: root
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - root=6.30.04
