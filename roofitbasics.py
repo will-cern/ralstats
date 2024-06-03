@@ -16,7 +16,7 @@ myList = None
 myYield = ROOT.RooRealVar("yield","yield",50,0,100)
 myObs = ROOT.RooRealVar("x","x",5,0,10)
 myPar1 = ROOT.RooRealVar("y","y",5,3,6)
-myPar2 = ROOT.RooRealVar("z","z",1,0,5)
+myPar2 = ROOT.RooRealVar("z","z",1,1e-9,5)
 myGaus = ROOT.RooGaussian("myPdf","myPdf",myObs,myPar1,myPar2)
 myModel = ROOT.RooExtendPdf("myModel","myModel",myGaus,myYield)
 
