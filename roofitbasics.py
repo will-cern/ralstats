@@ -68,13 +68,21 @@ def getObject(objName):
         globs = own(own(model.getVariables()).selectByAttrib("global",True))
         w.var("sig_mass").setVal(100)
         w.var("mu").setVal(0)
-        d = model.generate(obs, ROOT.RooFit.Extended())
-        d.SetName("obsData");d.SetTitle("Data")
-        globs.first().setVal(5.5)
-        d.setGlobalObservables(globs)
-        w.Import(d,ROOT.RooFit.Silence(True))
+        # seems we cannot use RooFit built-in generation b.c. dataset reduce method not behaving correctly with the channelCat
+        # d = model.generate(obs, ROOT.RooFit.Extended())
+        # d.SetName("obsData");d.SetTitle("Data")
+        # globs.first().setVal(5.5)
+        # d.setGlobalObservables(globs)
+        # w.Import(d,ROOT.RooFit.Silence(True))
+        # globs.first().setVal(5)
+
+        w.var("mu").setError(1e-9) # stops warning from xRooFit
+        d = ROOT.xRooNode(w)["simPdf"].generate()
+        d.get().SetName("obsData")
+        d.get().SetTitle("Data")
+        w.Import(d.get(),ROOT.RooFit.Silence(True))
+
         #w.saveSnapshot("obsData",globs)
-        globs.first().setVal(5)
         return w
     
     raise RuntimeError("Unknown object {}".format(objName))
