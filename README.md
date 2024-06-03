@@ -4,6 +4,8 @@ These are the Hands-on "Statistical Analysis Lab" materials for the RAL Lectures
 
 # Setup
 
+Launch this tutorial in mybinder: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fgitlab.cern.ch%2Fwill%2Fralstats/HEAD)
+
 Please login to the jupyter server, open a terminal and clone this repository:
 
 ```
